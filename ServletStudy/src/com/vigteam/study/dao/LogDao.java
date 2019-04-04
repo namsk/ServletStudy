@@ -41,15 +41,9 @@ public class LogDao extends BaseDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			try {
-				if (rs != null) rs.close();
-			} catch (Exception e) {
-				
-			}
-			try { if (stmt != null) stmt.close(); }
-			catch (Exception e) {}
-			try { if (conn != null) conn.close(); }
-			catch (Exception e) {}
+			try { if (rs != null) rs.close(); } catch (Exception e) {}
+			try { if (stmt != null) stmt.close(); } catch (Exception e) {}
+			try { if (conn != null) conn.close(); } catch (Exception e) {}
 		}
 		return list;
 	}
@@ -70,12 +64,8 @@ public class LogDao extends BaseDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			try {
-				if (pstmt != null) pstmt.close();
-			} catch (Exception e) {}
-			try {
-				if (conn != null) conn.close();
-			} catch (Exception e) {}
+			try { if (pstmt != null) pstmt.close(); } catch (Exception e) {}
+			try { if (conn != null) conn.close(); } catch (Exception e) {}
 		}
 		return insertedCount;
 	}
