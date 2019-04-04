@@ -7,14 +7,19 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.vigteam.study.dao.LogDao;
+import com.vigteam.study.vo.LogVo;
 @WebServlet("/logs")
-public class LogServlet extends HttpServlet {
+public class LogServlet extends BaseServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, 
@@ -22,10 +27,20 @@ public class LogServlet extends HttpServlet {
 		resp.setContentType("text/html;charset=UTF-8");
 		resp.setCharacterEncoding("UTF-8");
 		
+		/*
 		PrintWriter writer = resp.getWriter();
 		writer.println("<ul>");
+		*/
+		LogDao dao = new LogDao(dbuser, dbpass);
+		List<LogVo> list = dao.getAllLogs();
 		
+		/*
+		for (LogVo vo: list) {
+			writer.println("<li>" + vo + "</li>")
+		}
+		*/
 		//	c##vigteam log 테이블로부터 내용을 SELECT 해서 화면에 표시
+		/*
 		Connection conn = null;	//	DB 접속 객체
 		Statement stmt = null;
 		ResultSet rs = null;
@@ -35,8 +50,8 @@ public class LogServlet extends HttpServlet {
 			//	2. Connection 얻기
 			String dburl = "jdbc:oracle:thin:@localhost:1522/orcl";
 			conn = DriverManager.getConnection(dburl, 
-					"vigteam", 
-					"vigteam");
+					dbuser, 
+					dbpass);
 			//	3. Statement 생성
 			stmt = conn.createStatement();
 			//	4. 쿼리 실행
@@ -60,9 +75,43 @@ public class LogServlet extends HttpServlet {
 			try { if (rs != null) rs.close(); } catch (Exception e) {}
 			try { if (stmt != null) stmt.close(); } catch (Exception e) {}
 			try { if (conn != null) conn.close(); } catch (Exception e) {}
-		}
+		} */
+		/*
 		writer.println("</ul>");
 		writer.close();
+		*/
+		req.setAttribute("list", list);
+		RequestDispatcher rd = 
+				req.getRequestDispatcher("/WEB-INF/views/logs.jsp");
+		rd.forward(req, resp);
 	}
+
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		req.setCharacterEncoding("UTF-8");
+		String name = req.getParameter("name");
+		String log = req.getParameter("log");
+		
+		resp.setContentType("text/html;charset=UTF-8");
+		resp.setCharacterEncoding("UTF-8");
+		
+		/*
+		PrintWriter writer = resp.getWriter();
+		writer.println("name=" + name + ", log=" + log);
+		writer.close();
+		*/
+		LogVo vo = new LogVo();
+		vo.setName(name);
+		vo.setLog(log);
+		
+		LogDao dao = new LogDao(dbuser, dbpass);
+		int insertedCount = dao.insertLog(vo);
+		
+		System.out.println("SUCCESS?:" + (insertedCount == 1));
+		
+		resp.sendRedirect(
+			req.getServletContext().getContextPath() + "/logs");
+	}
+	
 
 }
